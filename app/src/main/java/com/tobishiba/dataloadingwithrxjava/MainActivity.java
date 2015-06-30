@@ -60,12 +60,12 @@ public class MainActivity extends AppCompatActivity {
 
     private Observable<List<String>> getNetworkObservable() {
         return Observable.create(subscriber -> {
-            subscriber.onNext(getNetworkData());
+            subscriber.onNext(getDataFromNetwork());
             subscriber.onCompleted();
         });
     }
 
-    private List<String> getNetworkData() {
+    private List<String> getDataFromNetwork() {
         final int responseCode = makeLongRunningRequest();
         if(responseCode == RESPONSE_OK) {
             final List<String> dataFromNetwork = getData("from_network_");
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int makeLongRunningRequest() {
-        runOnUiThread(() -> mTextView.append("Long running request...\n\n"));
+        runOnUiThread(() -> mTextView.append("Long running request in background...\n\n"));
         sleep(3000);
         return new Random().nextInt(2);
     }
