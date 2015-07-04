@@ -33,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleLoadData() {
-        Observable.concat(getCacheObservable(), getNetworkObservable())
-                .subscribeOn(Schedulers.newThread())
+        Observable.merge(getCacheObservable().subscribeOn(Schedulers.newThread()),
+                         getNetworkObservable().subscribeOn(Schedulers.newThread()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleShowData);
     }
@@ -47,7 +47,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private List<String> getDataFromDb() {
+        runOnUiThread(() -> mTextView.append("Fetch data from database in background...\n"));
+        sleep(2000);
         return getData("from_db_");
+    }
+
+    private void sleep(final int millis) {
+        try { Thread.sleep(millis); } catch (InterruptedException e) {}
     }
 
     private List<String> getData(final String dataFrom) {
@@ -82,10 +88,6 @@ public class MainActivity extends AppCompatActivity {
         return new Random().nextInt(2);
     }
 
-    private void sleep(final int millis) {
-        try { Thread.sleep(millis); } catch (InterruptedException e) {}
-    }
-
     private void persistDataFromNetwork(final List<String> dataFromNetwork) {
         for(String data : dataFromNetwork) {
             runOnUiThread(() -> mTextView.append("Persist data in background: " + data + "\n"));
@@ -96,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         if(data.isEmpty()) {
             mTextView.append("\nNothing did change at server.\n\n");
         } else {
-            mTextView.append("\nShow data:\n" + data + "\n\n");
+            mTextView.append("\nShow data:\n" + data + "\n\n\n");
         }
     }
 }
